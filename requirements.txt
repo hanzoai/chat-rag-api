@@ -40,12 +40,9 @@ pydantic==2.9.2
 # Qdrant (hanzoai/vector) backend
 langchain-qdrant==0.2.0
 qdrant-client==1.12.1
-# Deterministic transitive pins so adding qdrant-client doesn't send pip into
-# backtracking (it shares grpcio/httpx/numpy with unstructured + onnxruntime,
-# which have loose bounds). All values = what the working 0.7.8-hanzo image
-# already resolved to, so this is a no-op for the existing stack.
+# Pin only onnxruntime: it's the one dep with loose bounds across unstructured +
+# rapidocr-onnxruntime that pip backtracks on once qdrant-client is added.
+# 1.22.0 = what the working 0.7.8-hanzo image resolved to. (Don't pin httpx/
+# protobuf/grpcio — langchain-google-vertexai constrains httpx, and an explicit
+# pin makes the strict resolver fail where transitive resolution succeeds.)
 onnxruntime==1.22.0
-numpy==1.26.4
-grpcio==1.73.0
-httpx==0.28.1
-protobuf==6.31.1
