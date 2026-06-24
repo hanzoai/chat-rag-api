@@ -201,12 +201,22 @@ def init_embeddings(provider, model):
     if provider == EmbeddingsProvider.OPENAI:
         from langchain_openai import OpenAIEmbeddings
 
+        # langchain's OpenAIEmbeddings defaults check_embedding_ctx_length=True,
+        # which tiktoken-tokenizes inputs and sends INTEGER token-id arrays as
+        # `input`. Only api.openai.com accepts that shape; OpenAI-compatible
+        # providers (Fireworks, Together, vLLM, Hanzo gateway, …) reject it with
+        # 400 "malformed input". When pointed at a non-OpenAI base URL, send raw
+        # strings instead. Real-OpenAI behavior (base URL unset or *.openai.com)
+        # is unchanged.
+        base = (RAG_OPENAI_BASEURL or "").strip()
+        is_openai = base == "" or "api.openai.com" in base
         return OpenAIEmbeddings(
             model=model,
             api_key=RAG_OPENAI_API_KEY,
             openai_api_base=RAG_OPENAI_BASEURL,
             openai_proxy=RAG_OPENAI_PROXY,
             chunk_size=EMBEDDINGS_CHUNK_SIZE,
+            check_embedding_ctx_length=is_openai,
         )
     elif provider == EmbeddingsProvider.AZURE:
         from langchain_openai import AzureOpenAIEmbeddings
