@@ -37,12 +37,8 @@ python-pptx==0.6.23
 xlrd==2.0.1
 pydantic==2.9.2
 
-# Qdrant (hanzoai/vector) backend
+# Qdrant (hanzoai/vector) backend. The rest of the stack is pinned exactly by
+# constraints.txt (the working 0.7.8-hanzo image's `pip freeze`), so pip can't
+# backtrack on the already-resolved set — only these two get added on top.
 langchain-qdrant==0.2.0
 qdrant-client==1.12.1
-# Pin only onnxruntime: it's the one dep with loose bounds across unstructured +
-# rapidocr-onnxruntime that pip backtracks on once qdrant-client is added.
-# 1.22.0 = what the working 0.7.8-hanzo image resolved to. (Don't pin httpx/
-# protobuf/grpcio — langchain-google-vertexai constrains httpx, and an explicit
-# pin makes the strict resolver fail where transitive resolution succeeds.)
-onnxruntime==1.22.0

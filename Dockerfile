@@ -14,8 +14,11 @@ RUN apt-get update \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt constraints.txt ./
+# constraints.txt pins the entire working 0.7.8-hanzo set exactly; requirements
+# adds qdrant on top. This keeps pip from backtracking across the loose bounds
+# in unstructured / onnxruntime / openai when the qdrant deps are introduced.
+RUN pip install --no-cache-dir -c constraints.txt -r requirements.txt
 
 # Download standard NLTK data, to prevent unstructured from downloading packages at runtime
 RUN python -m nltk.downloader -d /app/nltk_data punkt_tab averaged_perceptron_tagger
