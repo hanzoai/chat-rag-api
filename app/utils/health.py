@@ -16,11 +16,15 @@ def qdrant_health_check() -> bool:
         return False
 
 
-def is_health_ok():
+async def is_health_ok() -> bool:
+    # The route awaits this. pg/mongo checks are coroutines; the Qdrant check is
+    # a sync bool. Await the async backends and return the sync one directly so
+    # the result is a uniform awaitable bool (await on a plain bool raises
+    # TypeError: "object bool can't be used in 'await' expression").
     if VECTOR_DB_TYPE == VectorDBType.PGVECTOR:
-        return pg_health_check()
+        return await pg_health_check()
     if VECTOR_DB_TYPE == VectorDBType.ATLAS_MONGO:
-        return mongo_health_check()
+        return await mongo_health_check()
     if VECTOR_DB_TYPE == VectorDBType.QDRANT:
         return qdrant_health_check()
     return True

@@ -22,7 +22,14 @@ from langchain_core.runnables import run_in_executor
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from functools import lru_cache
 
-from app.config import logger, vector_store, RAG_UPLOAD_DIR, CHUNK_SIZE, CHUNK_OVERLAP
+from app.config import (
+    logger,
+    vector_store,
+    embeddings,
+    RAG_UPLOAD_DIR,
+    CHUNK_SIZE,
+    CHUNK_OVERLAP,
+)
 from app.constants import ERROR_MESSAGES
 from app.models import (
     StoreDocument,
@@ -151,10 +158,15 @@ async def delete_documents(document_ids: List[str] = Body(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Cache the embedding function with LRU cache
+# Cache the embedding function with LRU cache.
+# Use the module-level `embeddings` object (the configured embedder) directly
+# rather than reaching into the vector store: pgvector's PGVector exposes
+# `.embedding_function`, but langchain's QdrantVectorStore does not — it exposes
+# `.embeddings`. Going through the shared `embeddings` instance is backend-
+# agnostic and avoids that attribute mismatch.
 @lru_cache(maxsize=128)
 def get_cached_query_embedding(query: str):
-    return vector_store.embedding_function.embed_query(query)
+    return embeddings.embed_query(query)
 
 
 @router.post("/query")
