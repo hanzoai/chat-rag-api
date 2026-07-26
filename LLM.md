@@ -1,4 +1,29 @@
-# Hanzo Chat RAG API
+# Hanzo Chat RAG API — RETIRED (consolidated into hanzoai/ai)
+
+> **STATUS: redundant — do not deploy new work here.** RAG has been consolidated
+> into `hanzoai/ai` (issue #35). `ai` is now the ONE RAG layer: it serves this
+> service's exact contract (`/embed`, `/query`, `/query_multiple`, `/documents`,
+> `/documents/{id}/context`) under `/v1`, backed by the same Hanzo Vector +
+> Hanzo Search infra that powers doc/crawl RAG. Uploaded files become a `file_id`
+> filter over the unified `{owner}-{store}-docs` index — no separate store.
+>
+> **Migration (no chat-repo code change):** set hanzo.chat's `RAG_API_URL` to
+> `https://api.hanzo.ai/v1`. Endpoint mapping (LibreChat client → ai):
+>
+> | chat-rag-api (this repo) | hanzoai/ai (consolidated) |
+> |--------------------------|---------------------------|
+> | `POST /embed` (multipart) | `POST /v1/embed` (multipart, same body) |
+> | `POST /query` | `POST /v1/query` |
+> | `POST /query_multiple` | `POST /v1/query_multiple` |
+> | `DELETE /documents` | `DELETE /v1/documents` |
+> | `GET /documents/{id}/context` | `GET /v1/documents/{id}/context` |
+>
+> Native (non-LibreChat) callers should prefer the canonical `/v1/rag/*` surface
+> in `ai`. Once the `RAG_API_URL` cutover is confirmed in prod, **archive this
+> repo** (do not delete — keep git history). Code home:
+> `hanzoai/ai` → `object/rag.go`, `controllers/rag.go`,
+> `controllers/rag_librechat.go`, `object/search_docs.go` (file_id filter),
+> `split/recursive.go` (chunk parity).
 
 FastAPI RAG service for Hanzo Chat (LibreChat fork): document ingest,
 embedding, chunking, and vector similarity retrieval. Mounted by chat via

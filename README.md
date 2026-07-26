@@ -1,4 +1,11 @@
-﻿# ID-based RAG FastAPI
+﻿# ID-based RAG FastAPI — RETIRED (consolidated into `hanzoai/ai`)
+
+> **This service is redundant.** RAG has been consolidated into `hanzoai/ai`
+> (issue #35), which now serves this exact contract under `/v1` on the same
+> Hanzo Vector + Hanzo Search infrastructure. To migrate hanzo.chat, set
+> `RAG_API_URL=https://api.hanzo.ai/v1` — no chat-repo code change. See
+> `LLM.md` for the full endpoint mapping and archive plan. Do not start new work
+> here.
 
 ## Overview
 This project integrates Langchain with FastAPI in an Asynchronous, Scalable manner, providing a framework for document indexing and retrieval, using PostgreSQL/pgvector.
